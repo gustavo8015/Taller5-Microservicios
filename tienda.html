@@ -5,124 +5,191 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TecnoTienda | Microservicios</title>
 <style>
-  :root { --fondo:#f4f6f9; --tarjeta:#fff; --texto:#1f2933; --suave:#6b7785; --borde:#dde3ea;
-          --azul:#2457c5; --ok:#1f9254; --error:#c53030; }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: "Segoe UI", system-ui, sans-serif; background:var(--fondo); color:var(--texto); }
-  header { background:#16213e; color:#fff; padding:16px 24px; display:flex; flex-wrap:wrap; gap:16px;
-           align-items:center; justify-content:space-between; }
-  header h1 { margin:0; font-size:1.35rem; }
-  header small { color:#aab4c8; }
-  .estados { display:flex; gap:10px; flex-wrap:wrap; }
-  .estado { background:#24304f; border-radius:20px; padding:6px 12px; font-size:.85rem; display:flex; align-items:center; gap:8px; }
-  .punto { width:10px; height:10px; border-radius:50%; background:#888; }
-  .punto.on { background:#3ddc84; box-shadow:0 0 6px #3ddc84; }
-  .punto.off { background:#ff5c5c; }
-  main { max-width:1200px; margin:0 auto; padding:20px 16px; display:grid; gap:18px;
-         grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
-  section { background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; padding:16px 18px; }
-  h2 { margin:0 0 4px; font-size:1.1rem; }
-  .servicio { color:var(--suave); font-size:.8rem; margin-bottom:12px; }
+  :root { --fondo:#f3f5f9; --tarjeta:#fff; --texto:#1d2433; --suave:#6a7487; --borde:#e1e6ee;
+          --marca:#3b5bdb; --marca2:#5f3dc4; --ok:#2b8a3e; --error:#c92a2a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Segoe UI", system-ui, sans-serif; background:var(--fondo); color:var(--texto); }
+  .cabecera { background:linear-gradient(120deg,#1b2350,#3b2a7a); color:#fff; }
+  .barra { max-width:1240px; margin:0 auto; padding:14px 18px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between; }
+  .logo { display:flex; align-items:center; gap:10px; font-size:1.3rem; font-weight:700; }
+  .logo span { font-size:1.6rem; }
+  .logo small { display:block; font-size:.75rem; font-weight:400; color:#c3c8e8; }
+  .estados { display:flex; gap:8px; flex-wrap:wrap; }
+  .estado { background:rgba(255,255,255,.12); border-radius:20px; padding:5px 11px; font-size:.8rem; display:flex; align-items:center; gap:7px; }
+  .punto { width:9px; height:9px; border-radius:50%; background:#999; }
+  .punto.on { background:#51cf66; box-shadow:0 0 6px #51cf66; } .punto.off { background:#ff6b6b; }
+  .btn-carrito { background:#fff; color:var(--marca2); border:0; border-radius:22px; padding:8px 16px; font:inherit; font-weight:600; cursor:pointer; }
+  .btn-carrito b { background:var(--marca2); color:#fff; border-radius:12px; padding:1px 8px; margin-left:6px; }
+  nav { max-width:1240px; margin:0 auto; padding:0 18px; display:flex; gap:4px; overflow-x:auto; }
+  nav button { background:none; border:0; color:#c3c8e8; font:inherit; padding:10px 16px; cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap; }
+  nav button.activa { color:#fff; border-bottom-color:#fff; font-weight:600; }
+  main { max-width:1240px; margin:0 auto; padding:22px 18px; }
+  .vista { display:none; } .vista.activa { display:block; }
+  h2 { margin:0 0 4px; font-size:1.25rem; }
+  .sub { color:var(--suave); font-size:.85rem; margin-bottom:16px; }
+  .rejilla { display:grid; gap:16px; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); }
+  .producto { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; transition:transform .15s, box-shadow .15s; }
+  .producto:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(30,40,80,.10); }
+  .foto { height:130px; display:grid; place-items:center; font-size:3.6rem; background:linear-gradient(135deg,#edf2ff,#f3f0ff); }
+  .info { padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .nombre { font-weight:600; }
+  .precio { font-size:1.15rem; font-weight:700; color:var(--marca2); }
+  .stock { font-size:.8rem; color:var(--suave); } .stock.bajo { color:#e8590c; }
+  .accion { margin-top:auto; display:flex; gap:6px; }
+  .accion input { width:64px; flex:0 0 64px; }
+  input, select { width:100%; min-width:0; padding:9px; border:1px solid var(--borde); border-radius:8px; font:inherit; background:#fff; }
+  button.pri { padding:9px 14px; border:0; border-radius:8px; background:var(--marca); color:#fff; font:inherit; font-weight:600; cursor:pointer; flex:1; }
+  button.pri:disabled { background:#adb5bd; cursor:not-allowed; }
+  .panel { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px; padding:18px; }
+  .dos { display:grid; gap:18px; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); }
+  form { display:grid; gap:10px; } form > * { min-width:0; }
+  .fila { display:flex; gap:10px; } .fila > * { flex:1; min-width:0; }
   table { width:100%; border-collapse:collapse; font-size:.9rem; }
-  th, td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--borde); }
-  th { color:var(--suave); font-weight:600; font-size:.8rem; }
-  td.num { text-align:right; }
-  form { display:grid; gap:8px; margin-top:12px; padding-top:12px; border-top:1px dashed var(--borde); }
-  .fila { display:flex; gap:8px; }
-  .fila > * { flex:1; min-width:0; }
-  form > *, input, select { min-width:0; }
-  input, select { width:100%; padding:8px; border:1px solid var(--borde); border-radius:6px; font:inherit; }
-  button { padding:9px 12px; border:0; border-radius:6px; background:var(--azul); color:#fff; font:inherit; cursor:pointer; }
-  button.sec { background:#e8edf5; color:var(--texto); }
-  .msg { font-size:.85rem; min-height:1.2em; }
-  .msg.ok { color:var(--ok); } .msg.error { color:var(--error); }
-  .vacio { color:var(--suave); font-size:.9rem; padding:8px 0; }
-  .caido { background:#fff3f3; border:1px solid #f3c2c2; color:var(--error); border-radius:6px; padding:10px; font-size:.9rem; }
-  .items { font-size:.9rem; color:var(--suave); }
-  .etiqueta { background:#e6f4ec; color:var(--ok); border-radius:4px; padding:2px 6px; font-size:.75rem; font-weight:600; }
+  th, td { text-align:left; padding:9px 6px; border-bottom:1px solid var(--borde); vertical-align:top; }
+  th { color:var(--suave); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.03em; }
+  .num { text-align:right; white-space:nowrap; }
+  .etiqueta { background:#ebfbee; color:var(--ok); border-radius:5px; padding:3px 8px; font-size:.75rem; font-weight:700; }
+  .alerta { border-radius:10px; padding:14px 16px; font-size:.92rem; background:#fff5f5; border:1px solid #ffc9c9; color:var(--error); grid-column:1 / -1; }
+  .vacio { color:var(--suave); padding:10px 0; }
+  .msg { font-size:.87rem; min-height:1.2em; } .msg.ok { color:var(--ok); } .msg.error { color:var(--error); }
+  .fondo-carrito { position:fixed; inset:0; background:rgba(15,20,40,.35); display:none; }
+  .carrito { position:fixed; top:0; right:0; height:100%; width:min(380px, 100%); background:#fff; box-shadow:-8px 0 24px rgba(0,0,0,.15);
+             transform:translateX(100%); transition:transform .25s; display:flex; flex-direction:column; }
+  .abierto .fondo-carrito { display:block; } .abierto .carrito { transform:none; }
+  .carrito .tit { padding:16px 18px; border-bottom:1px solid var(--borde); display:flex; justify-content:space-between; align-items:center; }
+  .carrito .tit button { background:none; border:0; font-size:1.4rem; cursor:pointer; color:var(--suave); }
+  .lineas { flex:1; overflow:auto; padding:8px 18px; }
+  .linea { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--borde); }
+  .linea .ico { font-size:1.6rem; }
+  .linea .det { flex:1; font-size:.9rem; } .linea .det small { color:var(--suave); }
+  .cant { display:flex; align-items:center; gap:6px; }
+  .cant button { width:26px; height:26px; border-radius:50%; border:1px solid var(--borde); background:#fff; cursor:pointer; }
+  .pie { padding:16px 18px; border-top:1px solid var(--borde); display:grid; gap:10px; }
+  .total { display:flex; justify-content:space-between; font-size:1.1rem; font-weight:700; }
+  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1d2433; color:#fff; padding:10px 18px; border-radius:8px; font-size:.9rem; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .toast.ver { opacity:1; }
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>TecnoTienda</h1>
-    <small>Aplicación cliente de la arquitectura de microservicios</small>
+<header class="cabecera">
+  <div class="barra">
+    <div class="logo"><span>🛒</span><div>TecnoTienda<small>Aplicación cliente · arquitectura de microservicios</small></div></div>
+    <div class="estados">
+      <div class="estado"><span class="punto" id="st-productos"></span>Productos :8001</div>
+      <div class="estado"><span class="punto" id="st-clientes"></span>Clientes :8002</div>
+      <div class="estado"><span class="punto" id="st-pedidos"></span>Pedidos :8003</div>
+    </div>
+    <button class="btn-carrito" id="abrir-carrito">Carrito <b id="cuenta">0</b></button>
   </div>
-  <div class="estados">
-    <div class="estado"><span class="punto" id="st-productos"></span>Productos :8001</div>
-    <div class="estado"><span class="punto" id="st-clientes"></span>Clientes :8002</div>
-    <div class="estado"><span class="punto" id="st-pedidos"></span>Pedidos :8003</div>
-  </div>
+  <nav>
+    <button data-vista="tienda" class="activa">Tienda</button>
+    <button data-vista="clientes">Clientes</button>
+    <button data-vista="pedidos">Pedidos</button>
+    <button data-vista="admin">Administración</button>
+  </nav>
 </header>
 
 <main>
-  <section>
+  <section class="vista activa" id="v-tienda">
     <h2>Catálogo de productos</h2>
-    <div class="servicio">Servicio de Productos · GET/POST /productos</div>
-    <div id="catalogo"></div>
-    <form id="f-producto">
-      <input name="nombre" placeholder="Nombre del producto" required>
-      <div class="fila">
-        <input name="precio" type="number" min="1" placeholder="Precio" required>
-        <input name="stock" type="number" min="0" placeholder="Existencias" required>
-      </div>
-      <button>Registrar producto</button>
-      <div class="msg" id="m-producto"></div>
-    </form>
+    <div class="sub">Datos del servicio de Productos (GET /productos)</div>
+    <div id="catalogo" class="rejilla"></div>
   </section>
 
-  <section>
+  <section class="vista" id="v-clientes">
     <h2>Clientes</h2>
-    <div class="servicio">Servicio de Clientes · GET/POST /clientes</div>
-    <div id="clientes"></div>
-    <form id="f-cliente">
-      <input name="nombre" placeholder="Nombre completo" required>
-      <input name="correo" type="email" placeholder="Correo electrónico" required>
-      <button>Registrar cliente</button>
-      <div class="msg" id="m-cliente"></div>
-    </form>
-  </section>
-
-  <section>
-    <h2>Nuevo pedido</h2>
-    <div class="servicio">Servicio de Pedidos · POST /pedidos (consulta Clientes y Productos)</div>
-    <form id="f-pedido" style="border-top:0;margin-top:0;padding-top:0">
-      <select name="cliente" id="sel-cliente" required></select>
-      <div class="fila">
-        <select id="sel-producto"></select>
-        <input id="cantidad" type="number" min="1" value="1" style="flex:0 0 80px">
-        <button type="button" class="sec" id="agregar">Agregar</button>
+    <div class="sub">Datos del servicio de Clientes (GET y POST /clientes)</div>
+    <div class="dos">
+      <div class="panel"><div id="clientes"></div></div>
+      <div class="panel">
+        <form id="f-cliente">
+          <strong>Registrar cliente</strong>
+          <input name="nombre" placeholder="Nombre completo" required>
+          <input name="correo" type="email" placeholder="Correo electrónico" required>
+          <button class="pri">Registrar cliente</button>
+          <div class="msg" id="m-cliente"></div>
+        </form>
       </div>
-      <div id="carrito" class="items">Sin artículos.</div>
-      <button>Registrar pedido</button>
-      <div class="msg" id="m-pedido"></div>
-    </form>
+    </div>
   </section>
 
-  <section>
+  <section class="vista" id="v-pedidos">
     <h2>Pedidos registrados</h2>
-    <div class="servicio">Servicio de Pedidos · GET /pedidos</div>
-    <div id="pedidos"></div>
+    <div class="sub">Datos del servicio de Pedidos (GET /pedidos)</div>
+    <div class="panel"><div id="pedidos"></div></div>
+  </section>
+
+  <section class="vista" id="v-admin">
+    <h2>Administración del catálogo</h2>
+    <div class="sub">Registro en el servicio de Productos (POST /productos)</div>
+    <div class="dos">
+      <div class="panel">
+        <form id="f-producto">
+          <strong>Nuevo producto</strong>
+          <input name="nombre" placeholder="Nombre del producto" required>
+          <div class="fila">
+            <input name="precio" type="number" min="1" placeholder="Precio" required>
+            <input name="stock" type="number" min="0" placeholder="Existencias" required>
+          </div>
+          <button class="pri">Registrar producto</button>
+          <div class="msg" id="m-producto"></div>
+        </form>
+      </div>
+      <div class="panel"><div id="inventario"></div></div>
+    </div>
   </section>
 </main>
 
+<div id="capa-carrito">
+  <div class="fondo-carrito" id="fondo"></div>
+  <aside class="carrito">
+    <div class="tit"><strong>Tu carrito</strong><button id="cerrar-carrito" aria-label="Cerrar">×</button></div>
+    <div class="lineas" id="lineas"></div>
+    <div class="pie">
+      <div class="total"><span>Total</span><span id="total">$ 0</span></div>
+      <select id="sel-cliente"></select>
+      <button class="pri" id="comprar">Confirmar pedido</button>
+      <div class="msg" id="m-pedido"></div>
+    </div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
-const API = { productos: "http://127.0.0.1:8001", clientes: "http://127.0.0.1:8002", pedidos: "http://127.0.0.1:8003" };
+const API = { productos:"http://127.0.0.1:8001", clientes:"http://127.0.0.1:8002", pedidos:"http://127.0.0.1:8003" };
 const pesos = n => "$ " + Number(n).toLocaleString("es-CO");
-let productos = [], clientes = [], carrito = [];
+let productos = [], carrito = [];
+
+function icono(nombre) {
+  const n = nombre.toLowerCase();
+  const mapa = [["portátil","💻"],["portatil","💻"],["laptop","💻"],["mouse","🖱️"],["teclado","⌨️"],["monitor","🖥️"],
+                ["pantalla","🖥️"],["audífono","🎧"],["audifono","🎧"],["diadema","🎧"],["celular","📱"],["tablet","📱"],
+                ["cámara","📷"],["camara","📷"],["impresora","🖨️"],["reloj","⌚"],["memoria","💾"],["disco","💽"],["parlante","🔊"]];
+  const hit = mapa.find(([k]) => n.includes(k));
+  return hit ? hit[1] : "📦";
+}
 
 async function llamar(servicio, ruta, opciones = {}) {
-  const r = await fetch(API[servicio] + ruta, { headers: { "Content-Type": "application/json" }, ...opciones });
+  const r = await fetch(API[servicio] + ruta, { headers:{ "Content-Type":"application/json" }, ...opciones });
   const datos = await r.json();
-  if (!r.ok) {
-    const d = datos.detail;
-    throw new Error(Array.isArray(d) ? d.map(e => `${e.loc.at(-1)}: ${e.msg}`).join("; ") : d);
-  }
+  if (!r.ok) { const d = datos.detail; throw new Error(Array.isArray(d) ? d.map(e => `${e.loc.at(-1)}: ${e.msg}`).join("; ") : d); }
   return datos;
 }
+const sinRed = (err, s) => err.message.includes("fetch") ? `Servicio de ${s} no disponible.` : err.message;
 function aviso(id, texto, ok) { const m = document.getElementById(id); m.textContent = texto; m.className = "msg " + (ok ? "ok" : "error"); }
-function caido(id, servicio) { document.getElementById(id).innerHTML = `<div class="caido">El servicio de ${servicio} no responde. Las demás funciones siguen disponibles.</div>`; }
+function toast(t) { const e = document.getElementById("toast"); e.textContent = t; e.classList.add("ver"); setTimeout(() => e.classList.remove("ver"), 2200); }
+const alerta = s => `<div class="alerta">⚠️ El servicio de ${s} no responde. Las demás secciones de la tienda siguen disponibles.</div>`;
 
+// Navegación por pestañas y carrito lateral
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("activa", x === b));
+  document.querySelectorAll(".vista").forEach(v => v.classList.toggle("activa", v.id === "v-" + b.dataset.vista));
+});
+const capa = document.getElementById("capa-carrito");
+document.getElementById("abrir-carrito").onclick = () => capa.classList.add("abierto");
+document.getElementById("cerrar-carrito").onclick = document.getElementById("fondo").onclick = () => capa.classList.remove("abierto");
+
+// Estado de los servicios (GET /salud)
 async function verificarEstados() {
   for (const s of Object.keys(API)) {
     const p = document.getElementById("st-" + s);
@@ -130,81 +197,111 @@ async function verificarEstados() {
   }
 }
 
+// Servicio de Productos
 async function cargarProductos() {
   try {
     productos = await llamar("productos", "/productos");
-    document.getElementById("catalogo").innerHTML = `<table><tr><th>ID</th><th>Producto</th><th>Precio</th><th>Exist.</th></tr>` +
-      productos.map(p => `<tr><td>${p.id}</td><td>${p.nombre}</td><td class="num">${pesos(p.precio)}</td><td class="num">${p.stock}</td></tr>`).join("") + `</table>`;
-    const sel = document.getElementById("sel-producto"), previo = sel.value;
-    sel.innerHTML = productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("");
-    if (productos.some(p => String(p.id) === previo)) sel.value = previo;
-  } catch { productos = []; caido("catalogo", "productos"); document.getElementById("sel-producto").innerHTML = `<option value="">Catálogo no disponible</option>`; }
+    document.getElementById("catalogo").innerHTML = productos.map(p => `
+      <div class="producto">
+        <div class="foto">${icono(p.nombre)}</div>
+        <div class="info">
+          <div class="nombre">${p.nombre}</div>
+          <div class="precio">${pesos(p.precio)}</div>
+          <div class="stock ${p.stock < 5 ? "bajo" : ""}">${p.stock} disponibles</div>
+          <div class="accion">
+            <input type="number" min="1" value="1" id="c-${p.id}" aria-label="Cantidad">
+            <button class="pri" data-agregar="${p.id}" ${p.stock === 0 ? "disabled" : ""}>Agregar</button>
+          </div>
+        </div>
+      </div>`).join("");
+    document.querySelectorAll("[data-agregar]").forEach(b => b.onclick = () => agregar(Number(b.dataset.agregar)));
+    document.getElementById("inventario").innerHTML = `<table><tr><th>ID</th><th>Producto</th><th class="num">Precio</th><th class="num">Exist.</th></tr>` +
+      productos.map(p => `<tr><td>${p.id}</td><td>${icono(p.nombre)} ${p.nombre}</td><td class="num">${pesos(p.precio)}</td><td class="num">${p.stock}</td></tr>`).join("") + `</table>`;
+  } catch {
+    productos = [];
+    document.getElementById("catalogo").innerHTML = alerta("productos");
+    document.getElementById("inventario").innerHTML = alerta("productos");
+  }
 }
 
+// Carrito
+function agregar(id) {
+  const p = productos.find(x => x.id === id); if (!p) return;
+  const cant = Math.max(1, Number(document.getElementById("c-" + id).value) || 1);
+  const l = carrito.find(x => x.producto_id === id);
+  if (l) l.cantidad += cant; else carrito.push({ producto_id:id, cantidad:cant, nombre:p.nombre, precio:p.precio });
+  pintarCarrito(); toast(`${cant} × ${p.nombre} agregado al carrito`);
+}
+function cambiar(id, delta) {
+  const l = carrito.find(x => x.producto_id === id); if (!l) return;
+  l.cantidad += delta; if (l.cantidad <= 0) carrito = carrito.filter(x => x !== l);
+  pintarCarrito();
+}
+function pintarCarrito() {
+  document.getElementById("cuenta").textContent = carrito.reduce((a, l) => a + l.cantidad, 0);
+  document.getElementById("lineas").innerHTML = carrito.length ? carrito.map(l => `
+    <div class="linea">
+      <div class="ico">${icono(l.nombre)}</div>
+      <div class="det">${l.nombre}<br><small>${pesos(l.precio)} c/u</small></div>
+      <div class="cant"><button onclick="cambiar(${l.producto_id},-1)">−</button>${l.cantidad}<button onclick="cambiar(${l.producto_id},1)">+</button></div>
+    </div>`).join("") : `<div class="vacio">Tu carrito está vacío.</div>`;
+  document.getElementById("total").textContent = pesos(carrito.reduce((a, l) => a + l.precio * l.cantidad, 0));
+}
+
+// Servicio de Pedidos: registrar
+document.getElementById("comprar").onclick = async () => {
+  if (!carrito.length) return aviso("m-pedido", "Agrega al menos un producto.", false);
+  try {
+    const p = await llamar("pedidos", "/pedidos", { method:"POST", body:JSON.stringify({
+      cliente_id:Number(document.getElementById("sel-cliente").value),
+      items:carrito.map(({ producto_id, cantidad }) => ({ producto_id, cantidad })) }) });
+    aviso("m-pedido", `Pedido #${p.id} registrado por ${pesos(p.total)}.`, true);
+    carrito = []; pintarCarrito(); cargarPedidos(); toast(`Pedido #${p.id} confirmado`);
+  } catch (err) { aviso("m-pedido", sinRed(err, "pedidos"), false); }
+};
+
+// Servicio de Clientes
 async function cargarClientes() {
   try {
-    clientes = await llamar("clientes", "/clientes");
+    const lista = await llamar("clientes", "/clientes");
     document.getElementById("clientes").innerHTML = `<table><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr>` +
-      clientes.map(c => `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.correo}</td></tr>`).join("") + `</table>`;
-    document.getElementById("sel-cliente").innerHTML = clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
-  } catch { caido("clientes", "clientes"); }
+      lista.map(c => `<tr><td>${c.id}</td><td>👤 ${c.nombre}</td><td>${c.correo}</td></tr>`).join("") + `</table>`;
+    const sel = document.getElementById("sel-cliente"), previo = sel.value;
+    sel.innerHTML = lista.map(c => `<option value="${c.id}">Comprar como: ${c.nombre}</option>`).join("");
+    if (lista.some(c => String(c.id) === previo)) sel.value = previo;
+  } catch { document.getElementById("clientes").innerHTML = alerta("clientes"); }
 }
-
-async function cargarPedidos() {
-  try {
-    const lista = await llamar("pedidos", "/pedidos");
-    document.getElementById("pedidos").innerHTML = lista.length ? `<table><tr><th>N.º</th><th>Cliente</th><th>Artículos</th><th>Total</th><th>Estado</th></tr>` +
-      lista.map(p => `<tr><td>${p.id}</td><td>${p.cliente_id}</td><td>${p.items.map(i => `${i.cantidad} × #${i.producto_id}`).join(", ")}</td><td class="num">${pesos(p.total)}</td><td><span class="etiqueta">${p.estado}</span></td></tr>`).join("") + `</table>`
-      : `<div class="vacio">Aún no hay pedidos.</div>`;
-  } catch { caido("pedidos", "pedidos"); }
-}
-
-function pintarCarrito() {
-  document.getElementById("carrito").innerHTML = carrito.length
-    ? carrito.map(i => `${i.cantidad} × ${i.nombre}`).join("<br>") : "Sin artículos.";
-}
-
-document.getElementById("agregar").onclick = () => {
-  const id = Number(document.getElementById("sel-producto").value);
-  const cantidad = Number(document.getElementById("cantidad").value);
-  const prod = productos.find(p => p.id === id);
-  if (!prod || cantidad < 1) return aviso("m-pedido", "Seleccione un producto disponible.", false);
-  const existente = carrito.find(i => i.producto_id === id);
-  existente ? existente.cantidad += cantidad : carrito.push({ producto_id: id, cantidad, nombre: prod.nombre });
-  pintarCarrito(); aviso("m-pedido", "", true);
-};
-
-document.getElementById("f-producto").onsubmit = async e => {
-  e.preventDefault(); const f = e.target;
-  try {
-    const p = await llamar("productos", "/productos", { method: "POST", body: JSON.stringify({ nombre: f.nombre.value, precio: Number(f.precio.value), stock: Number(f.stock.value) }) });
-    aviso("m-producto", `Producto #${p.id} registrado.`, true); f.reset(); cargarProductos();
-  } catch (err) { aviso("m-producto", err.message.includes("fetch") ? "Servicio de productos no disponible." : err.message, false); }
-};
-
 document.getElementById("f-cliente").onsubmit = async e => {
   e.preventDefault(); const f = e.target;
   try {
-    const c = await llamar("clientes", "/clientes", { method: "POST", body: JSON.stringify({ nombre: f.nombre.value, correo: f.correo.value }) });
+    const c = await llamar("clientes", "/clientes", { method:"POST", body:JSON.stringify({ nombre:f.nombre.value, correo:f.correo.value }) });
     aviso("m-cliente", `Cliente #${c.id} registrado.`, true); f.reset(); cargarClientes();
-  } catch (err) { aviso("m-cliente", err.message.includes("fetch") ? "Servicio de clientes no disponible." : err.message, false); }
+  } catch (err) { aviso("m-cliente", sinRed(err, "clientes"), false); }
 };
 
-document.getElementById("f-pedido").onsubmit = async e => {
-  e.preventDefault();
-  if (!carrito.length) return aviso("m-pedido", "Agregue al menos un artículo.", false);
+// Administración: registrar producto
+document.getElementById("f-producto").onsubmit = async e => {
+  e.preventDefault(); const f = e.target;
   try {
-    const p = await llamar("pedidos", "/pedidos", { method: "POST", body: JSON.stringify({
-      cliente_id: Number(document.getElementById("sel-cliente").value),
-      items: carrito.map(({ producto_id, cantidad }) => ({ producto_id, cantidad })) }) });
-    aviso("m-pedido", `Pedido #${p.id} registrado por ${pesos(p.total)}.`, true);
-    carrito = []; pintarCarrito(); cargarPedidos();
-  } catch (err) { aviso("m-pedido", err.message.includes("fetch") ? "Servicio de pedidos no disponible." : err.message, false); }
+    const p = await llamar("productos", "/productos", { method:"POST", body:JSON.stringify({ nombre:f.nombre.value, precio:Number(f.precio.value), stock:Number(f.stock.value) }) });
+    aviso("m-producto", `Producto #${p.id} registrado.`, true); f.reset(); cargarProductos();
+  } catch (err) { aviso("m-producto", sinRed(err, "productos"), false); }
 };
 
-function refrescar() { verificarEstados(); cargarProductos(); cargarClientes(); cargarPedidos(); }
-refrescar();
-setInterval(() => { verificarEstados(); }, 3000);
+// Servicio de Pedidos: consultar
+async function cargarPedidos() {
+  try {
+    const lista = await llamar("pedidos", "/pedidos");
+    const nombre = id => (productos.find(p => p.id === id) || {}).nombre || `Producto #${id}`;
+    document.getElementById("pedidos").innerHTML = lista.length ? `<table><tr><th>N.º</th><th>Cliente</th><th>Artículos</th><th class="num">Total</th><th>Estado</th><th>Fecha</th></tr>` +
+      lista.map(p => `<tr><td>${p.id}</td><td>#${p.cliente_id}</td><td>${p.items.map(i => `${i.cantidad} × ${nombre(i.producto_id)}`).join("<br>")}</td>
+        <td class="num">${pesos(p.total)}</td><td><span class="etiqueta">${p.estado}</span></td><td>${p.fecha}</td></tr>`).join("") + `</table>`
+      : `<div class="vacio">Aún no hay pedidos.</div>`;
+  } catch { document.getElementById("pedidos").innerHTML = alerta("pedidos"); }
+}
+
+verificarEstados(); cargarProductos().then(cargarPedidos); cargarClientes(); pintarCarrito();
+setInterval(verificarEstados, 3000);
 setInterval(() => { cargarProductos(); cargarPedidos(); }, 6000);
 </script>
 </body>

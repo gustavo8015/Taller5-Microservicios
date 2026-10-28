@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TecnoTienda | Microservicios</title>
+<style>
+  :root { --fondo:#f4f6f9; --tarjeta:#fff; --texto:#1f2933; --suave:#6b7785; --borde:#dde3ea;
+          --azul:#2457c5; --ok:#1f9254; --error:#c53030; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: "Segoe UI", system-ui, sans-serif; background:var(--fondo); color:var(--texto); }
+  header { background:#16213e; color:#fff; padding:16px 24px; display:flex; flex-wrap:wrap; gap:16px;
+           align-items:center; justify-content:space-between; }
+  header h1 { margin:0; font-size:1.35rem; }
+  header small { color:#aab4c8; }
+  .estados { display:flex; gap:10px; flex-wrap:wrap; }
+  .estado { background:#24304f; border-radius:20px; padding:6px 12px; font-size:.85rem; display:flex; align-items:center; gap:8px; }
+  .punto { width:10px; height:10px; border-radius:50%; background:#888; }
+  .punto.on { background:#3ddc84; box-shadow:0 0 6px #3ddc84; }
+  .punto.off { background:#ff5c5c; }
+  main { max-width:1200px; margin:0 auto; padding:20px 16px; display:grid; gap:18px;
+         grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  section { background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; padding:16px 18px; }
+  h2 { margin:0 0 4px; font-size:1.1rem; }
+  .servicio { color:var(--suave); font-size:.8rem; margin-bottom:12px; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  th, td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--borde); }
+  th { color:var(--suave); font-weight:600; font-size:.8rem; }
+  td.num { text-align:right; }
+  form { display:grid; gap:8px; margin-top:12px; padding-top:12px; border-top:1px dashed var(--borde); }
+  .fila { display:flex; gap:8px; }
+  .fila > * { flex:1; min-width:0; }
+  form > *, input, select { min-width:0; }
+  input, select { width:100%; padding:8px; border:1px solid var(--borde); border-radius:6px; font:inherit; }
+  button { padding:9px 12px; border:0; border-radius:6px; background:var(--azul); color:#fff; font:inherit; cursor:pointer; }
+  button.sec { background:#e8edf5; color:var(--texto); }
+  .msg { font-size:.85rem; min-height:1.2em; }
+  .msg.ok { color:var(--ok); } .msg.error { color:var(--error); }
+  .vacio { color:var(--suave); font-size:.9rem; padding:8px 0; }
+  .caido { background:#fff3f3; border:1px solid #f3c2c2; color:var(--error); border-radius:6px; padding:10px; font-size:.9rem; }
+  .items { font-size:.9rem; color:var(--suave); }
+  .etiqueta { background:#e6f4ec; color:var(--ok); border-radius:4px; padding:2px 6px; font-size:.75rem; font-weight:600; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>TecnoTienda</h1>
+    <small>Aplicación cliente de la arquitectura de microservicios</small>
+  </div>
+  <div class="estados">
+    <div class="estado"><span class="punto" id="st-productos"></span>Productos :8001</div>
+    <div class="estado"><span class="punto" id="st-clientes"></span>Clientes :8002</div>
+    <div class="estado"><span class="punto" id="st-pedidos"></span>Pedidos :8003</div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h2>Catálogo de productos</h2>
+    <div class="servicio">Servicio de Productos · GET/POST /productos</div>
+    <div id="catalogo"></div>
+    <form id="f-producto">
+      <input name="nombre" placeholder="Nombre del producto" required>
+      <div class="fila">
+        <input name="precio" type="number" min="1" placeholder="Precio" required>
+        <input name="stock" type="number" min="0" placeholder="Existencias" required>
+      </div>
+      <button>Registrar producto</button>
+      <div class="msg" id="m-producto"></div>
+    </form>
+  </section>
+
+  <section>
+    <h2>Clientes</h2>
+    <div class="servicio">Servicio de Clientes · GET/POST /clientes</div>
+    <div id="clientes"></div>
+    <form id="f-cliente">
+      <input name="nombre" placeholder="Nombre completo" required>
+      <input name="correo" type="email" placeholder="Correo electrónico" required>
+      <button>Registrar cliente</button>
+      <div class="msg" id="m-cliente"></div>
+    </form>
+  </section>
+
+  <section>
+    <h2>Nuevo pedido</h2>
+    <div class="servicio">Servicio de Pedidos · POST /pedidos (consulta Clientes y Productos)</div>
+    <form id="f-pedido" style="border-top:0;margin-top:0;padding-top:0">
+      <select name="cliente" id="sel-cliente" required></select>
+      <div class="fila">
+        <select id="sel-producto"></select>
+        <input id="cantidad" type="number" min="1" value="1" style="flex:0 0 80px">
+        <button type="button" class="sec" id="agregar">Agregar</button>
+      </div>
+      <div id="carrito" class="items">Sin artículos.</div>
+      <button>Registrar pedido</button>
+      <div class="msg" id="m-pedido"></div>
+    </form>
+  </section>
+
+  <section>
+    <h2>Pedidos registrados</h2>
+    <div class="servicio">Servicio de Pedidos · GET /pedidos</div>
+    <div id="pedidos"></div>
+  </section>
+</main>
+
+<script>
+const API = { productos: "http://127.0.0.1:8001", clientes: "http://127.0.0.1:8002", pedidos: "http://127.0.0.1:8003" };
+const pesos = n => "$ " + Number(n).toLocaleString("es-CO");
+let productos = [], clientes = [], carrito = [];
+
+async function llamar(servicio, ruta, opciones = {}) {
+  const r = await fetch(API[servicio] + ruta, { headers: { "Content-Type": "application/json" }, ...opciones });
+  const datos = await r.json();
+  if (!r.ok) {
+    const d = datos.detail;
+    throw new Error(Array.isArray(d) ? d.map(e => `${e.loc.at(-1)}: ${e.msg}`).join("; ") : d);
+  }
+  return datos;
+}
+function aviso(id, texto, ok) { const m = document.getElementById(id); m.textContent = texto; m.className = "msg " + (ok ? "ok" : "error"); }
+function caido(id, servicio) { document.getElementById(id).innerHTML = `<div class="caido">El servicio de ${servicio} no responde. Las demás funciones siguen disponibles.</div>`; }
+
+async function verificarEstados() {
+  for (const s of Object.keys(API)) {
+    const p = document.getElementById("st-" + s);
+    try { await fetch(API[s] + "/salud"); p.className = "punto on"; } catch { p.className = "punto off"; }
+  }
+}
+
+async function cargarProductos() {
+  try {
+    productos = await llamar("productos", "/productos");
+    document.getElementById("catalogo").innerHTML = `<table><tr><th>ID</th><th>Producto</th><th>Precio</th><th>Exist.</th></tr>` +
+      productos.map(p => `<tr><td>${p.id}</td><td>${p.nombre}</td><td class="num">${pesos(p.precio)}</td><td class="num">${p.stock}</td></tr>`).join("") + `</table>`;
+    const sel = document.getElementById("sel-producto"), previo = sel.value;
+    sel.innerHTML = productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("");
+    if (productos.some(p => String(p.id) === previo)) sel.value = previo;
+  } catch { productos = []; caido("catalogo", "productos"); document.getElementById("sel-producto").innerHTML = `<option value="">Catálogo no disponible</option>`; }
+}
+
+async function cargarClientes() {
+  try {
+    clientes = await llamar("clientes", "/clientes");
+    document.getElementById("clientes").innerHTML = `<table><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr>` +
+      clientes.map(c => `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.correo}</td></tr>`).join("") + `</table>`;
+    document.getElementById("sel-cliente").innerHTML = clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
+  } catch { caido("clientes", "clientes"); }
+}
+
+async function cargarPedidos() {
+  try {
+    const lista = await llamar("pedidos", "/pedidos");
+    document.getElementById("pedidos").innerHTML = lista.length ? `<table><tr><th>N.º</th><th>Cliente</th><th>Artículos</th><th>Total</th><th>Estado</th></tr>` +
+      lista.map(p => `<tr><td>${p.id}</td><td>${p.cliente_id}</td><td>${p.items.map(i => `${i.cantidad} × #${i.producto_id}`).join(", ")}</td><td class="num">${pesos(p.total)}</td><td><span class="etiqueta">${p.estado}</span></td></tr>`).join("") + `</table>`
+      : `<div class="vacio">Aún no hay pedidos.</div>`;
+  } catch { caido("pedidos", "pedidos"); }
+}
+
+function pintarCarrito() {
+  document.getElementById("carrito").innerHTML = carrito.length
+    ? carrito.map(i => `${i.cantidad} × ${i.nombre}`).join("<br>") : "Sin artículos.";
+}
+
+document.getElementById("agregar").onclick = () => {
+  const id = Number(document.getElementById("sel-producto").value);
+  const cantidad = Number(document.getElementById("cantidad").value);
+  const prod = productos.find(p => p.id === id);
+  if (!prod || cantidad < 1) return aviso("m-pedido", "Seleccione un producto disponible.", false);
+  const existente = carrito.find(i => i.producto_id === id);
+  existente ? existente.cantidad += cantidad : carrito.push({ producto_id: id, cantidad, nombre: prod.nombre });
+  pintarCarrito(); aviso("m-pedido", "", true);
+};
+
+document.getElementById("f-producto").onsubmit = async e => {
+  e.preventDefault(); const f = e.target;
+  try {
+    const p = await llamar("productos", "/productos", { method: "POST", body: JSON.stringify({ nombre: f.nombre.value, precio: Number(f.precio.value), stock: Number(f.stock.value) }) });
+    aviso("m-producto", `Producto #${p.id} registrado.`, true); f.reset(); cargarProductos();
+  } catch (err) { aviso("m-producto", err.message.includes("fetch") ? "Servicio de productos no disponible." : err.message, false); }
+};
+
+document.getElementById("f-cliente").onsubmit = async e => {
+  e.preventDefault(); const f = e.target;
+  try {
+    const c = await llamar("clientes", "/clientes", { method: "POST", body: JSON.stringify({ nombre: f.nombre.value, correo: f.correo.value }) });
+    aviso("m-cliente", `Cliente #${c.id} registrado.`, true); f.reset(); cargarClientes();
+  } catch (err) { aviso("m-cliente", err.message.includes("fetch") ? "Servicio de clientes no disponible." : err.message, false); }
+};
+
+document.getElementById("f-pedido").onsubmit = async e => {
+  e.preventDefault();
+  if (!carrito.length) return aviso("m-pedido", "Agregue al menos un artículo.", false);
+  try {
+    const p = await llamar("pedidos", "/pedidos", { method: "POST", body: JSON.stringify({
+      cliente_id: Number(document.getElementById("sel-cliente").value),
+      items: carrito.map(({ producto_id, cantidad }) => ({ producto_id, cantidad })) }) });
+    aviso("m-pedido", `Pedido #${p.id} registrado por ${pesos(p.total)}.`, true);
+    carrito = []; pintarCarrito(); cargarPedidos();
+  } catch (err) { aviso("m-pedido", err.message.includes("fetch") ? "Servicio de pedidos no disponible." : err.message, false); }
+};
+
+function refrescar() { verificarEstados(); cargarProductos(); cargarClientes(); cargarPedidos(); }
+refrescar();
+setInterval(() => { verificarEstados(); }, 3000);
+setInterval(() => { cargarProductos(); cargarPedidos(); }, 6000);
+</script>
+</body>
+</html>
